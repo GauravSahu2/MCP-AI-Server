@@ -1,0 +1,22 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-serving-to-control-plane
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: model-control-plane
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/default"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-all-by-default
+  namespace: default
+spec:
+  {} # Empty spec means deny all by default

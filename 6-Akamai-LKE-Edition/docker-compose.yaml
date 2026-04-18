@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  milvus:
+    image: milvusdb/milvus:v2.3.1
+    command: ["milvus", "run", "standalone"]
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Control Plane Registry
+  model-control-plane:
+    build: 
+      context: ./apps/model-control-plane
+    ports:
+      - "8080:80"
+    environment:
+      - MILVUS_HOST=milvus
+    depends_on:
+      milvus:
+        condition: service_healthy
+
+  # Serving Interface (Mock RAG Logic)
+  model-serving-api:
+    build: 
+      context: ./apps/model-serving-api
+    ports:
+      - "8081:80"
+    environment:
+      - MILVUS_HOST=milvus
+    depends_on:
+      milvus:
+        condition: service_healthy
+
+  # Interactive UI
+  mcp-dashboard:
+    build:
+      context: ./apps/mcp-dashboard
+    ports:
+      - "3000:3000"
+    depends_on:
+      - model-control-plane
+      - model-serving-api

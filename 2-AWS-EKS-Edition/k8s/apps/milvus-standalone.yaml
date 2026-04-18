@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: milvus-standalone
+  namespace: default
+  labels:
+    app: milvus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: milvus
+  template:
+    metadata:
+      labels:
+        app: milvus
+    spec:
+      containers:
+      - name: milvus
+        image: milvusdb/milvus:v2.3.0
+        command: ["milvus", "run", "standalone"]
+        ports:
+        - containerPort: 19530
+        - containerPort: 9091
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: milvus-standalone
+  namespace: default
+spec:
+  selector:
+    app: milvus
+  ports:
+    - protocol: TCP
+      port: 19530
+      targetPort: 19530
+      name: grpc
+    - protocol: TCP
+      port: 9091
+      targetPort: 9091
+      name: metrics

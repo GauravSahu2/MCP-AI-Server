@@ -1,0 +1,14 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-serving-api
+  namespace: default
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    labelSelectors:
+      app: model-serving-api
+  duration: '10s'
+  scheduler:
+    cron: '@every 5m'

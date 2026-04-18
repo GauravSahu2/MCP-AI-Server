@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+
+# Docker
+.docker/
+*.log
+
+# Environment Files
+.env
+.env.*
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS related
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+bin/
+obj/
+out/

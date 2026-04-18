@@ -1,0 +1,23 @@
+# Git
+.git
+.gitignore
+
+# Environments
+.env
+venv/
+env/
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+
+# Infrastructure State
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Testing
+.pytest_cache/
+tests/

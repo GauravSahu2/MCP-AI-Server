@@ -1,0 +1,3 @@
+title = "gitleaks config"
+# This file allows specifying exceptions or custom rules for Gitleaks.
+# Empty to use defaults.

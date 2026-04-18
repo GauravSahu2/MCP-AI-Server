@@ -1,0 +1,23 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: latency-injection-serving-api
+  namespace: default
+spec:
+  action: delay
+  mode: all
+  selector:
+    labelSelectors:
+      app: model-serving-api
+  delay:
+    latency: '50ms'
+    correlation: '100'
+    jitter: '0ms'
+  direction: to
+  target:
+    selector:
+      labelSelectors:
+        app: model-control-plane
+  duration: '30s'
+  scheduler:
+    cron: '@every 2m'

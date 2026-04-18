@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-control-plane
+  namespace: default
+  labels:
+    app: model-control-plane
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: model-control-plane
+  template:
+    metadata:
+      labels:
+        app: model-control-plane
+    spec:
+      containers:
+      - name: mcp
+        image: mcp-registry:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-control-plane
+  namespace: default
+spec:
+  selector:
+    app: model-control-plane
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: model-control-plane-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: model-control-plane
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70

@@ -1,0 +1,46 @@
+# Network Policy to restrict access to the Model Control Plane
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-serving-api-to-mcp
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: model-control-plane
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: model-serving-api
+    ports:
+    - protocol: TCP
+      port: 8000
+
+---
+# Minimal Role needed for MCP to potentially read Secrets/ConfigMaps in its namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: mcp-config-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["secrets", "configmaps"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-mcp-secrets
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+roleRef:
+  kind: Role
+  name: mcp-config-reader
+  apiGroup: rbac.authorization.k8s.io

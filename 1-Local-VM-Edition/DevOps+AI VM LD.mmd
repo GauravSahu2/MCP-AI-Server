@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant WebUser as Global Internet Request
+    participant LoadBl as Cloud Load Balancer
+    participant SecScan as Ingress Controller
+    participant APIServer as Serving Platform (Python)
+    participant CtrlPlane as Model Tracker DB
+    
+    WebUser->>LoadBl: Sends JSON Payload
+    LoadBl->>SecScan: TLS/SSL Termination
+    SecScan->>APIServer: Forwards request to local Kubernetes Node
+    APIServer->>CtrlPlane: "Are we authorized to run Model V2?"
+    CtrlPlane-->>APIServer: "Yes, weights are loaded."
+    APIServer-->>WebUser: Returns Prediction Tensor

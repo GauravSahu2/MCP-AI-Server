@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-mcp-dashboard
+  namespace: default
+  labels:
+    grafana_dashboard: "1"
+data:
+  mcp-dashboard.json: |-
+    {
+      "title": "AI Platform Metrics (MCP & Serving)",
+      "uid": "mcp-monitoring",
+      "panels": [
+        {
+          "title": "Model Serving CPU Usage",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "rate(container_cpu_usage_seconds_total{pod=~\"model-serving-api.*\"}[5m])",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        },
+        {
+          "title": "Model Control Plane CPU Usage",
+          "type": "timeseries",
+          "targets": [
+            {
+              "expr": "rate(container_cpu_usage_seconds_total{pod=~\"model-control-plane.*\"}[5m])",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        }
+      ]
+    }
