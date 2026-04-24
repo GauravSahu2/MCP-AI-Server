@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: aegis-success-rate-and-latency
+  namespace: default
+spec:
+  metrics:
+  - name: success-rate
+    interval: 1m
+    successCondition: result >= 0.95
+    provider:
+      prometheus:
+        address: http://prometheus-operated.default.svc.cluster.local:9090
+        query: |
+          sum(rate(aegis_requests_total{endpoint=~"/predict", error_code="none"}[2m])) 
+          / 
+          sum(rate(aegis_requests_total{endpoint=~"/predict"}[2m]))
+  - name: p99-latency
+    interval: 1m
+    successCondition: result < 0.500 # Sub 500ms
+    provider:
+      prometheus:
+        address: http://prometheus-operated.default.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.99, sum(rate(aegis_request_latency_seconds_bucket{endpoint=~"/predict"}[2m])) by (le))

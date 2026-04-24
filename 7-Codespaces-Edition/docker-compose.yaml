@@ -37,6 +37,25 @@ services:
       milvus:
         condition: service_healthy
 
+  # MCP Server (JSON-RPC 2.0 / SSE)
+  mcp-server:
+    build:
+      context: ../../mcp-ai-platform/apps/mcp-server
+    ports:
+      - "8000:8000"
+    environment:
+      - CONTROL_PLANE_URL=http://model-control-plane:80
+    depends_on:
+      - model-control-plane
+
+  # Sovereign Failover Controller
+  failover-controller:
+    build:
+      context: ../../mcp-ai-platform/apps/failover-controller
+    environment:
+      - PRIMARY_API_URL=http://model-control-plane:80
+      - SECONDARY_API_URL=http://localhost:8080 # Simulate failover target
+
   # Interactive UI
   mcp-dashboard:
     build:

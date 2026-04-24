@@ -1,0 +1,33 @@
+# k8s/chaos/pod-kill-experiment.yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: model-serving-kill
+  namespace: default
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    labelSelectors:
+      app: model-serving-api
+  scheduler:
+    cron: "@every 10m"
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: model-serving-latency
+  namespace: default
+spec:
+  action: delay
+  mode: all
+  selector:
+    labelSelectors:
+      app: model-serving-api
+  delay:
+    latency: "200ms"
+    correlation: "100"
+    jitter: "50ms"
+  duration: "5m"
+  scheduler:
+    cron: "@every 30m"

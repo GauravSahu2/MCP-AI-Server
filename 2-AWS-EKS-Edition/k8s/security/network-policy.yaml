@@ -1,0 +1,34 @@
+# k8s/security/network-policy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-except-mcp
+  namespace: default
+spec:
+  podSelector: {} # Apply to all pods in namespace
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: mcp-server # Only allow traffic from MCP server
+    ports:
+    - protocol: TCP
+      port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-db-access
+spec:
+  podSelector:
+    matchLabels:
+      app: model-control-plane
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+  policyTypes:
+  - Egress

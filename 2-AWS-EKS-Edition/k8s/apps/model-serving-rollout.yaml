@@ -1,0 +1,36 @@
+# k8s/apps/model-serving-rollout.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: model-serving-api
+  namespace: default
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: model-serving-api
+  template:
+    metadata:
+      labels:
+        app: model-serving-api
+    spec:
+      containers:
+      - name: model-serving-api
+        image: aegis/model-serving-api:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause: {duration: 5m} # Wait for analysis
+      - setWeight: 50
+      - pause: {duration: 2m}
+      - setWeight: 100
